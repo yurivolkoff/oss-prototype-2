@@ -56,7 +56,52 @@ async function main() {
     '1.1 — hero-карточка на дашборде'
   )
 
-  // … coverage added progressively per module
+  // ─── Module 1 — full happy path ──────────────────────────────────
+  await page.getByRole('button', { name: 'Начать собрание' }).click()
+  await page.waitForURL(/\/oss\//)
+  await page.waitForLoadState('networkidle')
+  await shot(page, '02-preparation-overview')
+  await expect(
+    await page.getByRole('heading', { name: 'Подготовка данных по дому 1/2' }).isVisible(),
+    '1.2 — screen 02 рендерится'
+  )
+
+  await page.getByRole('button', { name: 'Верно, далее' }).click()
+  await page.waitForTimeout(300)
+  await shot(page, '03-premises-grid')
+  await expect(
+    await page.getByRole('heading', { name: 'Подготовка данных по дому 2/2' }).isVisible(),
+    '1.3 — screen 03 рендерится'
+  )
+
+  // Filter test: click «дубль» chip
+  await page.getByTestId('chip-duplicate').click()
+  await page.waitForTimeout(200)
+  await shot(page, '03-premises-filter-dubl')
+
+  // Reset filter, then click on apartment №15 (error tile)
+  await page.getByTestId('chip-duplicate').click()
+  await page.waitForTimeout(150)
+  await page.getByTestId('premise-tile-15').click()
+  await page.waitForTimeout(300)
+  await shot(page, '04-apartment-modal')
+  await expect(
+    await page.getByRole('dialog').isVisible(),
+    '1.4 — модалка квартиры открывается'
+  )
+
+  // Close modal via Esc
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(200)
+  await expect(
+    !(await page.getByRole('dialog').isVisible()),
+    '1.5 — Esc закрывает модалку'
+  )
+
+  // Continue from screen 03 — should advance to module 2 placeholder
+  await page.getByRole('button', { name: 'Продолжить' }).click()
+  await page.waitForTimeout(200)
+  await shot(page, '05-after-continue')
 
   // ─── FINAL ─────────────────────────────────────────────────────────
   console.log('\n──────────────────────────')
