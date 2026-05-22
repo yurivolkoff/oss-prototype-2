@@ -9,6 +9,17 @@ export type MeetingState =
   | 'work_info_required'
   | 'archived';
 
+export type MeetingSubState =
+  | null
+  | 'preparation_house_overview'
+  | 'preparation_premises'
+  | 'agenda_main'
+  | 'agenda_wizard_type'
+  | 'agenda_wizard_theme'
+  | 'agenda_wizard_questions'
+  | 'notification_form'
+  | 'notification_preview';
+
 export type DemoState =
   | MeetingState
   | 'voting_active_low_quorum'
@@ -109,6 +120,7 @@ export interface QuestionResult {
 export interface Meeting {
   id: string;
   state: MeetingState;
+  subState: MeetingSubState;
   isFirstInSystem: true;
 
   house: {

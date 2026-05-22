@@ -4,6 +4,7 @@ export function createInitialMeeting(): Meeting {
   return {
     id: 'demo-meeting-1',
     state: 'none',
+    subState: null,
     isFirstInSystem: true,
 
     house: {
