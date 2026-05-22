@@ -23,10 +23,10 @@ export default function Accordion({
   const Chevron = open ? ChevronUp : ChevronDown
 
   return (
-    <div className="border border-gray-200 rounded-xl">
+    <div className="border border-gray-200 rounded-xl overflow-hidden transition-colors hover:bg-gray-50">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-3 p-4 text-left hover:bg-gray-50"
+        className="w-full flex items-center gap-3 p-4 text-left"
         aria-expanded={open}
       >
         {number !== undefined && (
