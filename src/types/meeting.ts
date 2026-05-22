@@ -121,6 +121,7 @@ export interface Meeting {
   id: string;
   state: MeetingState;
   subState: MeetingSubState;
+  step1Completed: boolean;
   isFirstInSystem: true;
 
   house: {

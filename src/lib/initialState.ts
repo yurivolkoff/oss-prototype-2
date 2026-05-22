@@ -6,6 +6,7 @@ export function createInitialMeeting(): Meeting {
     id: 'demo-meeting-1',
     state: 'none',
     subState: null,
+    step1Completed: false,
     isFirstInSystem: true,
 
     house: {

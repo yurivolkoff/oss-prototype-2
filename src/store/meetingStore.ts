@@ -8,6 +8,7 @@ interface MeetingStore {
   startMeeting: () => void
   setState: (state: MeetingState) => void
   setSubState: (subState: MeetingSubState) => void
+  markStep1Completed: () => void
   reset: () => void
   // agenda
   addAgendaBlock: (block: AgendaBlock) => void
@@ -46,6 +47,9 @@ export const useMeetingStore = create<MeetingStore>((set) => ({
 
   setSubState: (subState) =>
     set((store) => ({ meeting: { ...store.meeting, subState } })),
+
+  markStep1Completed: () =>
+    set((store) => ({ meeting: { ...store.meeting, step1Completed: true } })),
 
   reset: () => set({ meeting: createInitialMeeting() }),
 
