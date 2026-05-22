@@ -1,5 +1,3 @@
-@import url('/oss-prototype-2/tokens.css');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
