@@ -1,0 +1,13 @@
+@import url('/oss-prototype-2/tokens.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--color-page-background, #F0F2F8);
+  color: var(--color-text-primary, #0D1B2A);
+}
