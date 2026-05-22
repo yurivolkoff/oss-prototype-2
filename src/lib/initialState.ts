@@ -1,4 +1,5 @@
 import type { Meeting } from '../types/meeting'
+import { generatePremises } from './demoData'
 
 export function createInitialMeeting(): Meeting {
   return {
@@ -20,7 +21,7 @@ export function createInitialMeeting(): Meeting {
       duplicatesCount: 98,
     },
 
-    premises: [],
+    premises: generatePremises(),
 
     administrator: {
       organizationName: 'ООО «Уют и комфорт»',
