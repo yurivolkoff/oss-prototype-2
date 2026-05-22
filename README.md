@@ -1,73 +1,37 @@
-# React + TypeScript + Vite
+# OSS Prototype 2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Кликабельный прототип администратора ОСС в ГИС ЖКХ 3.0 (Phase 0+).
 
-Currently, two official plugins are available:
+**Live:** https://yurivolkoff.github.io/oss-prototype-2/
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Стек
 
-## React Compiler
+- Vite + React + TypeScript
+- Tailwind CSS v3
+- zustand, react-router-dom, lucide-react, sonner, date-fns, clsx
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Разработка
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+nvm use            # Node 20 (см. .nvmrc)
+npm install
+npm run dev        # http://localhost:5173/oss-prototype-2/
+npm run build      # сборка в dist/
+npm run preview    # локальный предпросмотр сборки
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Деплой
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+GitHub Actions деплоит `main` на GitHub Pages автоматически
+(`.github/workflows/deploy.yml`).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Структура
+
+- `public/tokens.css` — дизайн-токены (из `docs/oss-prototype/design/src/tokens/`)
+- `public/icons/` — 46 SVG-иконок дизайн-системы
+- `public/logos/` — логотипы Госуслуг.Дом, ГИС ЖКХ, партнёров
+- `src/` — приложение
+
+## Генерируемый контент
+
+См. `GENERATED-CONTENT.md` — реестр всего, что добавлено сверх спецификации.
