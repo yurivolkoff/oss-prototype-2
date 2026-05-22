@@ -72,10 +72,54 @@ Tasks 7–13 из плана:
 - Tailwind classes используются для layout, inline `style` — для token-цветов через CSS-переменные. Это компромисс: чистый Tailwind не позволяет dynamic var() без extends в config, а `style` даёт прозрачность.
 - CI annotations про deprecation Node.js 20 — косметика, июнь 2026 cutoff.
 
-## Iteration 4 — 2026-05-22 (Phase 1 Bundle C — toast + forms) — pending
+## Iteration 4 — 2026-05-22 (Phase 1 Bundle C — toast + forms)
+
+Tasks 14–17 готовы:
+- `showComingSoon()` helper
+- `FormField`, `TextInput`, `Textarea` (с counter)
+- `Select`, `Checkbox`, `Radio`, `RadioActionRow`
+- `FileUploadArea`, `FileCard`
+
+4 коммита, тесты по-прежнему 8 проходят, build clean.
+
+## Iteration 5 — 2026-05-22 (Phase 1 Bundle D — modals + popover + demo + verify)
+
+Tasks 18–22 готовы:
+- `Modal` базовый (focus-trap, esc, overlay click, close-X) — **+5 TDD-тестов**
+- `ConfirmModal` (default focus на secondary «Отмена»)
+- `InfoPopover` (click trigger + esc/outside close)
+- `FoundationDemo` страница — витрина всех primitives
+- 404.html fallback для SPA-маршрутизации на GitHub Pages
+
+5 коммитов. Тесты: **13 всего** (5 Modal + 4 demoState + 4 meetingStore). Build: 298 kB JS, 13.2 kB CSS. Deploy green.
+
+### Decisions
+
+- **404.html через postbuild copy.** Vite не умеет это нативно для SPA на GH Pages. Простейший фикс — `cp dist/index.html dist/404.html` в build-скрипте. Юзер ходит по `/foundation-demo` через client-side routing с дашборда, никогда не приходит туда по прямому URL — поэтому HTTP-status 404 (с правильным телом) на cold-load приемлем.
+- **Button onClick wrap.** TypeScript ругался при передаче `onClick={showComingSoon}` напрямую — MouseEvent попадал бы в первый аргумент `label`. Обернул в `() => showComingSoon()`.
+
+### Phase 1 (foundation) — закрыта
+
+Все foundation-компоненты готовы. URL для проверки: https://yurivolkoff.github.io/oss-prototype-2/foundation-demo
+
+Готовность к Phase 2 (модули 1–5):
+- ✓ TypeScript-типы из data-model.md
+- ✓ Zustand store с reset()
+- ✓ Router + 2 страницы
+- ✓ Layout (хедер, футер, степпер, address bar)
+- ✓ Все UI primitives (Card, Button, Pill, KeyValueRow, InfoBlock, WarningBanner, StatusRow, Accordion)
+- ✓ Все form-компоненты (FormField, TextInput, Textarea, Select, Checkbox, Radio, RadioActionRow, FileUploadArea, FileCard)
+- ✓ Модалки (Modal, ConfirmModal)
+- ✓ InfoPopover
+- ✓ Toast helper
+- ✓ 13 unit-тестов проходят
+
+Следующая итерация (Phase 2 — модули) — отдельный план.
+
+## Phase 2 — Модули 1–5 (pending)
 
 _Будет заполнено по факту выполнения._
 
-## Iteration 5 — 2026-05-22 (Phase 1 Bundle D — modals + popover + demo + verify) — pending
+## Гейт Phase 3 — провизорно
 
-_Будет заполнено по факту выполнения._
+**Foundation sub-gate пройден** (модули ещё впереди). Полное закрытие фазы 3 — после реализации всех 5 модулей.
