@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 
-export default function DashboardPlaceholder() {
+export default function Dashboard() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="rounded-2xl bg-white shadow-sm p-8 max-w-md text-center">
