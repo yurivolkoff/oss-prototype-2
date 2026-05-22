@@ -9,7 +9,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   ({ label, className, disabled, ...rest }, ref) => (
     <label
       className={cn(
-        'inline-flex items-start gap-2 cursor-pointer',
+        'flex items-start gap-3 py-2 cursor-pointer',
         disabled && 'cursor-not-allowed opacity-70',
         className,
       )}

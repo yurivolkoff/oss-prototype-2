@@ -165,11 +165,11 @@ export default function FoundationDemo() {
                 placeholder="например, в нашем доме нужен ремонт кровли…"
               />
             </FormField>
-            <div className="space-y-2">
+            <div>
               <Checkbox checked disabled label="Обязательный вопрос (disabled)" />
               <Checkbox defaultChecked label="Рекомендуемый вопрос" />
             </div>
-            <div className="space-y-2">
+            <div>
               <Radio name="example" value="a" defaultChecked label="за" />
               <Radio name="example" value="b" label="воздержался" />
               <Radio name="example" value="c" label="против" />
