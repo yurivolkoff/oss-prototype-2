@@ -1,6 +1,6 @@
-# Logs
-logs
+# Logs (Vite default — but we keep `logs/` directory for prototype skill artifacts)
 *.log
+!logs/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
