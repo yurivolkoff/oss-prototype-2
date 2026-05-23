@@ -3,13 +3,15 @@ import Card from '../ui/Card'
 import Pill from '../ui/Pill'
 import Select from '../form/Select'
 import { showComingSoon } from '../toast/toastHelpers'
+import { useMeetingStore } from '../../store/meetingStore'
+import { formatDate } from '../../lib/format'
 
 interface HistoryRow {
   id: string
   type: string
   initiator: string
   dateRange: string
-  status: 'decision_made' | 'active'
+  status: 'decision_made' | 'active' | 'not_held'
 }
 
 // en-dash with spaces per text-diff
@@ -32,6 +34,18 @@ const ROWS: HistoryRow[] = [
 
 export default function HistoryTable() {
   const [filter, setFilter] = useState('premises')
+  const meeting = useMeetingStore((s) => s.meeting)
+
+  const dynamicRows: HistoryRow[] = [...ROWS]
+  if (meeting.state === 'archived' && meeting.voting.publishedAt && meeting.voting.endsAt) {
+    dynamicRows.push({
+      id: meeting.id,
+      type: 'Заочное собрание',
+      initiator: 'ООО «Уют и комфорт»',
+      dateRange: `${formatDate(meeting.voting.publishedAt)} – ${formatDate(meeting.voting.endsAt)}`,
+      status: meeting.voteResults.quorumReached ? 'decision_made' : 'not_held',
+    })
+  }
 
   return (
     <Card className="p-6">
@@ -50,7 +64,7 @@ export default function HistoryTable() {
         </div>
       </div>
       <div className="divide-y divide-gray-100">
-        {ROWS.map((row) => (
+        {dynamicRows.map((row) => (
           <button
             key={row.id}
             type="button"
@@ -63,6 +77,8 @@ export default function HistoryTable() {
             <div>
               {row.status === 'decision_made' ? (
                 <Pill tone="neutral">Решение принято</Pill>
+              ) : row.status === 'not_held' ? (
+                <Pill tone="error">Не состоялось</Pill>
               ) : (
                 <Pill tone="success">Активно</Pill>
               )}
