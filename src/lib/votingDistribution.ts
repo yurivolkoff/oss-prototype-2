@@ -31,8 +31,8 @@ export function buildVotingMap(meeting: Meeting): Map<string, VotingTileMeta> {
   // Green = first 21 apartment numbers in ascending order excluding the chosen beige/pink ones.
   // Pink: 14, 22, 78.
   const pinkNumbers = new Set(['14', '22', '78'])
-  // Beige (early): 17, 33. Late: 17, 33, 53, 59.
-  const beigeNumbers = new Set(isLowQuorum ? ['17', '33', '53', '59'] : ['17', '33'])
+  // Beige (early): 17, 33. Late: 17, 33, 26, 30 — keeping within the 30-apartment demo set.
+  const beigeNumbers = new Set(isLowQuorum ? ['17', '33', '26', '30'] : ['17', '33'])
 
   const apartments = meeting.premises
     .filter((p) => p.type === 'apartment')

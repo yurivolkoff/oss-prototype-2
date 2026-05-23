@@ -201,6 +201,49 @@ async function main() {
     finalUrl,
   )
 
+  // ─── Module 4 — voting active ────────────────────────────────────
+  // Demo-state jump: ?demo-state=voting_active opens directly on screen 13
+  await page.goto(BASE_URL + '/oss/demo?demo-state=voting_active')
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(400)
+  await shot(page, '13-voting-active')
+  await expect(
+    await page.getByRole('heading', { name: 'Активное голосование' }).isVisible(),
+    '4.1 — screen 13 rendered via demo-state'
+  )
+
+  // Verify progress bar shows ~21%
+  await expect(
+    (await page.getByText(/21\s*%/).count()) >= 1,
+    '4.2 — прогресс-бар показывает 21%'
+  )
+
+  // White tile click — opens M1 paper-ballot modal showing СНИЛС field
+  // Pick a known white tile (apt №25 — beyond the first 21 green slots, not in pink/beige seed sets)
+  await page.getByTestId('voting-tile-25').click()
+  await page.waitForTimeout(300)
+  await shot(page, '13-paper-ballot-modal')
+  await expect(
+    (await page.getByText(/СНИЛС/i).count()) >= 1,
+    '4.3a — М1 paper-ballot модалка содержит СНИЛС'
+  )
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(200)
+
+  // Low quorum variant
+  await page.goto(BASE_URL + '/oss/demo?demo-state=voting_active_low_quorum')
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(400)
+  await shot(page, '14-voting-low-quorum')
+  await expect(
+    (await page.getByText(/Голосование может не состояться/).count()) >= 1,
+    '4.3 — warning-banner на screen 14'
+  )
+  await expect(
+    (await page.getByText(/24\s*%/).count()) >= 1,
+    '4.4 — прогресс-бар показывает 24%'
+  )
+
   // ─── FINAL ─────────────────────────────────────────────────────────
   console.log('\n──────────────────────────')
   console.log(`Passed: ${results.filter((r) => r.ok).length}/${results.length}`)
