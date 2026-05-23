@@ -10,6 +10,8 @@ import AgendaWizardQuestions from '../components/meeting/AgendaWizardQuestions'
 import NotificationForm from '../components/meeting/NotificationForm'
 import NotificationPreview from '../components/meeting/NotificationPreview'
 import VotingActive from '../components/meeting/VotingActive'
+import VotingCompleted from '../components/meeting/VotingCompleted'
+import WorkInfoForm from '../components/meeting/WorkInfoForm'
 
 export default function MeetingFlow() {
   const meeting = useMeetingStore((s) => s.meeting)
@@ -73,6 +75,12 @@ export default function MeetingFlow() {
     }
     if (meeting.state === 'voting_active') {
       return <VotingActive />
+    }
+    if (meeting.state === 'voting_completed') {
+      return <VotingCompleted />
+    }
+    if (meeting.state === 'work_info_required') {
+      return <WorkInfoForm />
     }
     return (
       <PlaceholderForFutureTask
