@@ -340,3 +340,45 @@ Foundation primitives — visual компоненты + типы + state. Реа
 - **Почему:** screen 13 и screen 14 имеют одинаковый `meeting.state === 'voting_active'`, но рендерятся по-разному (WarningBanner на 14). Нужен маркер «какой демо-вариант запросил пользователь».
 - **Содержимое:** optional поле `_demoVariant: DemoState | null` устанавливается в `hydrateDemoState` для вариантов `voting_active` и `voting_active_low_quorum`. UI читает его в `VotingActive.tsx`.
 - **Статус:** новое (решение AFK)
+
+## Phase 2 — Модуль 5 (Завершение + размещение информации)
+
+### ResultBlock — карточка результата по блоку повестки
+- **Локация:** `src/components/meeting/ResultBlock.tsx`
+- **Тип:** новый UI + verbatim тексты из спеки
+- **Источник:** спека `05-completion.md` § Шаг 5.1
+- **Содержимое:** аккордеон с numbered badge + themeTitle + zhkRfReference. Trailing — pill «решение принято» (success) / «решение не принято» (error) на основе `meeting.voteResults.perQuestion[code].decisionMade` по всем checked-вопросам блока. Body: список вопросов, каждый с code+title, описанием (свёрнуто, expandable через chevron), строкой индикаторов 🟢 за / 🟡 воздержался / 🔴 против с процентами и tooltip (verbatim формат «за: X м² из Y м² общей площади = ZZ.ZZ% от всех голосов в доме»), pill принято/не принято. Подсекция «Документы» для capital_repair-блоков — chip Смета.pdf (1.2 МБ, toast) + link «скачать всё ⬇» (toast). При forceNotPassed (no_quorum) — все pill красные, вместо вопросов — заглушка «Решения по вопросам блока не приняты — собрание не состоялось».
+- **Статус:** новое
+
+### VotingCompleted — экран 15
+- **Локация:** `src/components/meeting/VotingCompleted.tsx`
+- **Тип:** новый UI + verbatim тексты из спеки
+- **Источник:** спека `05-completion.md` § Шаг 5.1 + § Контент
+- **Содержимое:** H2 «Завершение голосования» + lead (два варианта verbatim для «кворум набран» и «кворум не набран»). Карточка «Онлайн-голосование от DD.MM.YYYY» + neutral pill «завершилось» + sub-line «Инициатор — ООО «Уют и комфорт»». Главный показатель «Проголосовало — N%» + success/error pill. Helper-текст под показателем (verbatim, два варианта). Список ResultBlock'ов по блокам повестки (capital_repair блок — defaultOpen). При no_quorum — InfoBlock «Протокол несостоявшегося собрания» (verbatim, упоминание письма Минстроя № 67415-ДН/04 от 05.11.2025). Link «скачать протокол ⬇» (toast) + helper-текст справа (verbatim) + title-tooltip «Скачать копию протокола в PDF». CTA: при quorumReached + hasCapitalRepair — primary «Перейти к размещению информации» → setState('work_info_required'); иначе ghost-link «Вернуться на главную» → archiveMeeting + navigate('/').
+- **Статус:** новое (verbatim из спеки)
+
+### WorkInfoForm — экран 16
+- **Локация:** `src/components/meeting/WorkInfoForm.tsx`
+- **Тип:** новый UI + verbatim тексты из спеки
+- **Источник:** спека `05-completion.md` § Шаг 5.2 + § Контент
+- **Содержимое:** H2 «Размещение информации» + lead (verbatim). Карточка «Информация о проведённом капитальном ремонте» + подзаголовок (verbatim) + link «Протокол № 1 от DD.MM.YYYY г.» (toast). InfoBlock — verbatim текст про сроки 7 рабочих дней и штрафы по ст. 13.19.2 КоАП РФ + ⓘ popover с расширенным контекстом (verbatim, 209-ФЗ, приказ № 74/114/пр). Форма с lowercase микро-лейблами: вид работ * (Select, единственное значение «Капитальный ремонт кровли»), исполнитель * (TextInput, default «ООО «СтройСервис», ИНН 7707083893»), стоимость работ * (TextInput с ₽-suffix, default «3 000 000», parseRubInput + formatRub на blur), дата начала работ * (date input, default 01.09.2026), дата окончания работ * (default 30.10.2026). Подсекция «Документы»: договор подряда * (preloaded FileCard «Договор.pdf / 0.89 МБ»), акт выполненных работ * (preloaded FileCard «Акт.pdf / 0.69 МБ»), прочие документы (опц., FileUploadArea multiple + helper verbatim). Primary CTA «Разместить информацию» (всегда enabled — валидация на клик). Микрокопирайт под CTA (verbatim). Валидация: все required + дата конца ≥ дата начала + оба обязательных файла. Невалидные — red border + helper, scroll к первой ошибке. На успех — ConfirmModal «Разместить информацию о работах?» (verbatim текст из спеки, кнопки «Разместить»/«Отмена»). На confirm — publishWorkInfo + archiveMeeting + navigate('/').
+- **Статус:** новое (verbatim из спеки)
+
+### HistoryTable — динамическая строка для архивного собрания
+- **Локация:** `src/components/meeting/HistoryTable.tsx`
+- **Тип:** правка
+- **Почему:** после `state = 'archived'` на дашборде должна появиться запись о текущем собрании.
+- **Содержимое:** при `meeting.state === 'archived'` к двум демо-строкам добавляется третья: «Заочное собрание | ООО «Уют и комфорт» | publishedAt – endsAt | pill «Решение принято» (success) или «Не состоялось» (error)». Новый status `not_held` с error-pill.
+- **Статус:** новое
+
+### Демо-документы блока 2 на экране 15 (Смета.pdf)
+- **Локация:** `ResultBlock.tsx`
+- **Тип:** демо-данные
+- **Содержимое:** chip «Смета.pdf · 1.2 МБ». При клике — toast «Доступно в продакшене».
+- **Статус:** новое
+
+### Stepper-маппинг для voting_completed / work_info_required / archived
+- **Локация:** `src/pages/MeetingFlow.tsx`
+- **Тип:** правка
+- **Содержимое:** оставлен существующий маппинг (`voting_completed: 4`, `work_info_required: 5`, `archived: 5`) — даёт active на шаге 5 («Завершение голосования») для voting_completed и active на шаге 6 («Размещение информации») для work_info_required. После archive — возвращаемся на дашборд, степпер не виден.
+- **Статус:** verbatim из существующего кода
