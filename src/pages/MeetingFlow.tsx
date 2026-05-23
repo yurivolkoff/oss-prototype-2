@@ -7,6 +7,8 @@ import AgendaMain from '../components/meeting/AgendaMain'
 import AgendaWizardType from '../components/meeting/AgendaWizardType'
 import AgendaWizardTheme from '../components/meeting/AgendaWizardTheme'
 import AgendaWizardQuestions from '../components/meeting/AgendaWizardQuestions'
+import NotificationForm from '../components/meeting/NotificationForm'
+import NotificationPreview from '../components/meeting/NotificationPreview'
 
 export default function MeetingFlow() {
   const meeting = useMeetingStore((s) => s.meeting)
@@ -24,7 +26,7 @@ export default function MeetingFlow() {
       draft_preparation: 0,
       draft_ready: 2,
       preview_notification: 2,
-      notification_published: 2,
+      notification_published: 3,
       voting_active: 3,
       voting_completed: 4,
       work_info_required: 5,
@@ -61,6 +63,12 @@ export default function MeetingFlow() {
     }
     if (meeting.state === 'draft_preparation' && meeting.subState === 'agenda_wizard_questions') {
       return <AgendaWizardQuestions />
+    }
+    if (meeting.subState === 'notification_form') {
+      return <NotificationForm />
+    }
+    if (meeting.subState === 'notification_preview') {
+      return <NotificationPreview />
     }
     return (
       <PlaceholderForFutureTask
