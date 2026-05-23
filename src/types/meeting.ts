@@ -179,4 +179,8 @@ export interface Meeting {
     act: File | null;
     additionalDocs: File[];
   };
+
+  /** Optional demo variant marker — set by hydrateDemoState when a demo URL forces a state.
+   *  UI uses it to differentiate variants of the same MeetingState (e.g. voting_active_low_quorum). */
+  _demoVariant?: DemoState | null;
 }

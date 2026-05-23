@@ -9,6 +9,7 @@ import AgendaWizardTheme from '../components/meeting/AgendaWizardTheme'
 import AgendaWizardQuestions from '../components/meeting/AgendaWizardQuestions'
 import NotificationForm from '../components/meeting/NotificationForm'
 import NotificationPreview from '../components/meeting/NotificationPreview'
+import VotingActive from '../components/meeting/VotingActive'
 
 export default function MeetingFlow() {
   const meeting = useMeetingStore((s) => s.meeting)
@@ -69,6 +70,9 @@ export default function MeetingFlow() {
     }
     if (meeting.subState === 'notification_preview') {
       return <NotificationPreview />
+    }
+    if (meeting.state === 'voting_active') {
+      return <VotingActive />
     }
     return (
       <PlaceholderForFutureTask

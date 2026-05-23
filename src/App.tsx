@@ -8,16 +8,23 @@ import Dashboard from './pages/Dashboard'
 import FoundationDemo from './pages/FoundationDemo'
 import MeetingFlow from './pages/MeetingFlow'
 
-function App() {
+import { useLocation } from 'react-router-dom'
+
+function DemoStateHydrator() {
+  const location = useLocation()
   useEffect(() => {
-    const demoState = parseDemoState(window.location.search)
+    const demoState = parseDemoState(location.search)
     if (demoState) {
       useMeetingStore.setState((s) => ({ meeting: hydrateDemoState(s.meeting, demoState) }))
     }
-  }, [])
+  }, [location.search])
+  return null
+}
 
+function App() {
   return (
     <BrowserRouter basename="/oss-prototype-2">
+      <DemoStateHydrator />
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/foundation-demo" element={<FoundationDemo />} />

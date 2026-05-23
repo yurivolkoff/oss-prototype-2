@@ -43,9 +43,9 @@ export function hydrateDemoState(meeting: Meeting, demoState: DemoState): Meetin
     case 'notification_published':
       return { ...withMeetingBase(meeting), state: 'notification_published', subState: null }
     case 'voting_active':
-      return withVoting(withMeetingBase(meeting), 21, 14)
+      return { ...withVoting(withMeetingBase(meeting), 21, 14), state: 'voting_active', _demoVariant: 'voting_active' }
     case 'voting_active_low_quorum':
-      return withVoting(withMeetingBase(meeting), 24, 7)
+      return { ...withVoting(withMeetingBase(meeting), 24, 7), state: 'voting_active', _demoVariant: 'voting_active_low_quorum' }
     case 'voting_completed':
       return {
         ...withVoting(withMeetingBase(meeting), 74, 0),
