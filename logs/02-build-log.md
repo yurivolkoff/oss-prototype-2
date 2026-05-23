@@ -152,10 +152,62 @@ Tasks 18–22 готовы:
 
 5 коммитов (7835990 .. 30676e6). Build clean, 13 тестов проходят.
 
-## Phase 2 — Модули 1–5 (pending)
+## Phase 2 — Все модули + FIN — 2026-05-23
 
-_Будет заполнено по факту выполнения._
+### Итоги по модулям
+
+**30 коммитов** в Phase 2 (от `30676e6` foundation tech-review до HEAD). Все пять модулей + foundation extensions (F.x) + FIN реализованы AFK.
+
+| # | Модуль | Экраны | Файлы (≈) | Замечания |
+|---|---|---|---|---|
+| F | Foundation extensions | — | 3 | demo-state hydration, MeetingSubState, demoData |
+| 1 | Подготовка данных | 01–04 | 7 | Dashboard hero + accordions + шахматка + ApartmentModal (preparation mode) |
+| 2 | Конструктор повестки | 05–09 | 8 | AgendaMain + wizard 3-step + CustomQuestionModal + IncompleteAgendaModal |
+| 3 | Уведомление | 10–12 | 3 | NotificationForm + NotificationPreview + PublishConfirmModal |
+| 4 | Голосование | 13–14 | 5 | VotingActive + VotingProgressBar + VotingScoreboard + ApartmentModal (4 mode) + deterministic distribution |
+| 5 | Завершение | 15–16 | 4 | VotingCompleted + ResultBlock + WorkInfoForm + HistoryTable archived row |
+| FIN | Read-only | 01–12 после завершения | 6 | ReadOnlyBanner + readOnly prop в 4 экранах + stepper-clicks |
+
+### Тесты
+
+- **Unit:** 18 (5 Modal + 4 demoState + 4 meetingStore + 5 read-only-helper неявно покрывается e2e)
+- **E2E:** 25/25 проходят против live (`BASE_URL=https://yurivolkoff.github.io/oss-prototype-2 npm run e2e`)
+- **Build:** clean, 446.78 kB JS / 20.67 kB CSS / 1819 modules
+
+### URLs для ревью
+
+| URL | Что показывает |
+|---|---|
+| https://yurivolkoff.github.io/oss-prototype-2/ | Дашборд (screen 01) |
+| https://yurivolkoff.github.io/oss-prototype-2/oss/new | Старт собрания → preparation flow (screens 02 → 03 → 05 → wizard → 10 → 12) |
+| https://yurivolkoff.github.io/oss-prototype-2/oss/demo?demo-state=voting_active | Screen 13 — активное голосование |
+| https://yurivolkoff.github.io/oss-prototype-2/oss/demo?demo-state=voting_active_low_quorum | Screen 14 — голосование с риском |
+| https://yurivolkoff.github.io/oss-prototype-2/oss/demo?demo-state=voting_completed | Screen 15 — завершение (кворум набран) |
+| https://yurivolkoff.github.io/oss-prototype-2/oss/demo?demo-state=voting_completed_no_quorum | Screen 15 — несостоявшееся |
+| https://yurivolkoff.github.io/oss-prototype-2/oss/demo?demo-state=work_info_required | Screen 16 — размещение информации о работах |
+
+После любого `voting_completed` — клики на step 1/2/3 степпера ведут в read-only режим соответствующего экрана.
+
+### Open concerns для Юрия
+
+Каждое нетривиальное решение, принятое без user-input, залогировано в `logs/decisions-while-afk.md` (всего ≈ 20 записей). Ключевые:
+
+- **`step1Completed` boolean флаг** — отдельное поле в Meeting type, не часть state-machine.
+- **«Ремонт крыши» vs «Капитальный ремонт кровли»** — справочник тем называется «Ремонт крыши», итоговый block — «Капитальный ремонт кровли». Возможный фикс — один verbatim вариант.
+- **Дата срока работ 2026-12-31** — сдвинут от спекового 31.12.2025 (прошлое от текущей даты 2026-05-23).
+- **`_demoVariant` маркер** в Meeting type для различения 13 vs 14 экранов (одинаковый `state='voting_active'`).
+- **buildVotingMap детерминированное распределение** — pink/beige/green/white по фиксированным номерам квартир.
+- **PaperBallot СНИЛС/паспорт не персистятся** — store получает пустые строки.
+- **DemoStateHydrator на изменение URL** — переписан с mount-only на useLocation-listener.
+- **FakeFile для preloaded документов** в WorkInfoForm — упрощение, real upload не моделируется.
+- **HistoryTable archived строка** — динамически добавляется, не персистится.
+- **Read-only режим (FIN)** — реализован через readOnly-prop в 4 компонентах, не отдельный wrapper.
+- **Stepper-clicks** — только steps 1/2/3 кликабельны в read-only.
+
+### Phase 2 закрыт (провизорно)
+
+Phase 3 (Разработка) ставлю в `⚠️ provisional` — ждёт Юрия для прохода через прототип, ревью artefactов (GENERATED-CONTENT.md, decisions-while-afk.md) и финального approve. После approve — Phase 4 (Тех-ревью) / 5 (Бизнес-ревью) / 6 (Юзабилити-эмуляция).
 
 ## Гейт Phase 3 — провизорно
 
-**Foundation sub-gate пройден** (модули ещё впереди). Полное закрытие фазы 3 — после реализации всех 5 модулей.
+**Foundation sub-gate пройден.** Все 5 модулей + FIN реализованы. Tests green против live. Phase 3 ставится `⚠️ provisional` (см. `phase-status.md`) до user-review.
