@@ -244,6 +244,55 @@ async function main() {
     '4.4 — прогресс-бар показывает 24%'
   )
 
+  // ─── Module 5 — completion: success path ─────────────────────────
+  await page.goto(BASE_URL + '/oss/demo?demo-state=voting_completed')
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(400)
+  await shot(page, '15-voting-completed')
+  await expect(
+    (await page.getByText('кворум набран').count()) >= 1,
+    '5.1 — pill «кворум набран» на витрине результатов'
+  )
+
+  // Verify ResultBlock pills
+  await expect(
+    (await page.getByText('решение принято').count()) >= 1,
+    '5.2 — pill «решение принято» виден'
+  )
+
+  // Move to work-info form
+  await page.getByRole('button', { name: 'Перейти к размещению информации' }).click()
+  await page.waitForTimeout(300)
+  await shot(page, '16-work-info-form')
+  await expect(
+    await page.getByRole('heading', { name: 'Размещение информации' }).isVisible(),
+    '5.3 — screen 16 рендерится'
+  )
+
+  // Verify InfoBlock with КоАП
+  await expect(
+    (await page.getByText(/13\.19\.2\s*КоАП/).count()) >= 1,
+    '5.4 — InfoBlock со штрафами КоАП 13.19.2 виден'
+  )
+
+  // Click «Разместить информацию»
+  await page.getByRole('button', { name: 'Разместить информацию' }).click()
+  await page.waitForTimeout(200)
+  await page.getByRole('button', { name: 'Разместить', exact: true }).click()  // confirm modal
+  await page.waitForTimeout(500)
+  await page.waitForLoadState('networkidle')
+  await shot(page, '01-dashboard-after-archive')
+
+  // ─── Module 5 — no quorum variant ────────────────────────────────
+  await page.goto(BASE_URL + '/oss/demo?demo-state=voting_completed_no_quorum')
+  await page.waitForLoadState('networkidle')
+  await page.waitForTimeout(400)
+  await shot(page, '15-no-quorum')
+  await expect(
+    (await page.getByText('кворум не набран').count()) >= 1,
+    '5.5 — pill «кворум не набран» на варианте несостоявшегося'
+  )
+
   // ─── FINAL ─────────────────────────────────────────────────────────
   console.log('\n──────────────────────────')
   console.log(`Passed: ${results.filter((r) => r.ok).length}/${results.length}`)
