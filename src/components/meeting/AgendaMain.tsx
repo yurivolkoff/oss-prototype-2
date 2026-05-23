@@ -3,11 +3,16 @@ import Card from '../ui/Card'
 import Button from '../ui/Button'
 import AgendaBlockCard from './AgendaBlockCard'
 import IncompleteAgendaModal from './IncompleteAgendaModal'
+import ReadOnlyBanner from './ReadOnlyBanner'
 import { useMeetingStore } from '../../store/meetingStore'
 import { createBlock1 } from '../../lib/demoData'
 import { showComingSoon } from '../toast/toastHelpers'
 
-export default function AgendaMain() {
+interface AgendaMainProps {
+  readOnly?: boolean
+}
+
+export default function AgendaMain({ readOnly = false }: AgendaMainProps = {}) {
   const meeting = useMeetingStore((s) => s.meeting)
   const addAgendaBlock = useMeetingStore((s) => s.addAgendaBlock)
   const setSubState = useMeetingStore((s) => s.setSubState)
@@ -15,8 +20,10 @@ export default function AgendaMain() {
   const [showIncompleteModal, setShowIncompleteModal] = useState(false)
   const block1AddedRef = useRef(false)
 
-  // Auto-create block 1 on first enter (guarded against StrictMode double-invoke)
+  // Auto-create block 1 on first enter (guarded against StrictMode double-invoke).
+  // Skipped in read-only mode: history view should not mutate the store.
   useEffect(() => {
+    if (readOnly) return
     if (block1AddedRef.current) return
     const exists = useMeetingStore.getState().meeting.agenda.some((b) => b.id === 'block-1')
     if (!exists) {
@@ -52,6 +59,7 @@ export default function AgendaMain() {
 
   return (
     <div className="space-y-6">
+      {readOnly && <ReadOnlyBanner />}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 leading-tight">
@@ -66,7 +74,7 @@ export default function AgendaMain() {
             Как формируется повестка &gt;
           </button>
         </div>
-        <Button onClick={handleAddBlock}>Добавить блок вопрос</Button>
+        {!readOnly && <Button onClick={handleAddBlock}>Добавить блок вопрос</Button>}
       </div>
 
       <Card className="p-6">
@@ -76,19 +84,21 @@ export default function AgendaMain() {
               key={block.id}
               block={block}
               defaultOpen={idx === meeting.agenda.length - 1}
-              disableQuestionToggle={block.id === 'block-1'}
-              showEditLink
-              onEdit={() => handleEditBlock(block.id)}
+              disableQuestionToggle={readOnly || block.id === 'block-1'}
+              showEditLink={!readOnly}
+              onEdit={readOnly ? undefined : () => handleEditBlock(block.id)}
             />
           ))}
 
-          <div className="flex justify-center pt-4">
-            {hasBlock2Plus ? (
-              <Button onClick={handleContinue}>Продолжить</Button>
-            ) : (
-              <Button disabled>Сохранить</Button>
-            )}
-          </div>
+          {!readOnly && (
+            <div className="flex justify-center pt-4">
+              {hasBlock2Plus ? (
+                <Button onClick={handleContinue}>Продолжить</Button>
+              ) : (
+                <Button disabled>Сохранить</Button>
+              )}
+            </div>
+          )}
         </div>
       </Card>
 

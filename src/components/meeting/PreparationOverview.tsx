@@ -6,12 +6,14 @@ import InfoBlock from '../ui/InfoBlock'
 import Accordion from '../ui/Accordion'
 import Pill from '../ui/Pill'
 import InfoPopover from '../popover/InfoPopover'
+import ReadOnlyBanner from './ReadOnlyBanner'
 import { Check, ExternalLink, Download } from 'lucide-react'
 import { useMeetingStore } from '../../store/meetingStore'
 import { showComingSoon } from '../toast/toastHelpers'
 
 interface PreparationOverviewProps {
   onContinue: () => void
+  readOnly?: boolean
 }
 
 function formatDate(iso: string): string {
@@ -20,11 +22,12 @@ function formatDate(iso: string): string {
   return `${d}.${m}.${y}`
 }
 
-export default function PreparationOverview({ onContinue }: PreparationOverviewProps) {
+export default function PreparationOverview({ onContinue, readOnly = false }: PreparationOverviewProps) {
   const house = useMeetingStore((s) => s.meeting.house)
 
   return (
     <div className="space-y-6">
+      {readOnly && <ReadOnlyBanner />}
       <BackLink to="/" />
 
       <div>
@@ -120,9 +123,11 @@ export default function PreparationOverview({ onContinue }: PreparationOverviewP
         </div>
       </InfoBlock>
 
-      <div className="flex justify-center pt-2">
-        <Button onClick={onContinue}>Верно, далее</Button>
-      </div>
+      {!readOnly && (
+        <div className="flex justify-center pt-2">
+          <Button onClick={onContinue}>Верно, далее</Button>
+        </div>
+      )}
     </div>
   )
 }

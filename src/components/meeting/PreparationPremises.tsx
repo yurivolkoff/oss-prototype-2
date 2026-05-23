@@ -11,10 +11,15 @@ import PremiseFilters, {
 } from './PremiseFilters'
 import PremisesGrid from './PremisesGrid'
 import ApartmentModal from './ApartmentModal'
+import ReadOnlyBanner from './ReadOnlyBanner'
 import { useMeetingStore } from '../../store/meetingStore'
 import { showComingSoon } from '../toast/toastHelpers'
 
-export default function PreparationPremises() {
+interface PreparationPremisesProps {
+  readOnly?: boolean
+}
+
+export default function PreparationPremises({ readOnly = false }: PreparationPremisesProps = {}) {
   const meeting = useMeetingStore((s) => s.meeting)
   const setSubState = useMeetingStore((s) => s.setSubState)
   const markStep1Completed = useMeetingStore((s) => s.markStep1Completed)
@@ -41,6 +46,7 @@ export default function PreparationPremises() {
 
   return (
     <div className="space-y-6">
+      {readOnly && <ReadOnlyBanner />}
       <button
         type="button"
         onClick={goBack}
@@ -121,9 +127,11 @@ export default function PreparationPremises() {
         </div>
         <PremisesGrid premises={filteredPremises} onTileClick={(p) => setSelectedPremiseId(p.id)} />
 
-        <div className="flex justify-center mt-8">
-          <Button onClick={handleContinue}>Продолжить</Button>
-        </div>
+        {!readOnly && (
+          <div className="flex justify-center mt-8">
+            <Button onClick={handleContinue}>Продолжить</Button>
+          </div>
+        )}
       </Card>
 
       <ApartmentModal

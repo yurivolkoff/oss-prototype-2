@@ -4,7 +4,7 @@ import Pill from '../ui/Pill'
 interface FileCardProps {
   name: string
   sizeBytes: number
-  onRemove: () => void
+  onRemove?: () => void
   badge?: { label: string; tone: 'success' | 'warning' | 'error' | 'neutral' }
 }
 
@@ -24,13 +24,15 @@ export default function FileCard({ name, sizeBytes, onRemove, badge }: FileCardP
         <div className="text-xs text-gray-500">{formatSize(sizeBytes)}</div>
       </div>
       {badge && <Pill tone={badge.tone}>{badge.label}</Pill>}
-      <button
-        onClick={onRemove}
-        className="p-1 rounded hover:bg-gray-100"
-        aria-label="Удалить файл"
-      >
-        <X className="w-4 h-4 text-gray-500" />
-      </button>
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className="p-1 rounded hover:bg-gray-100"
+          aria-label="Удалить файл"
+        >
+          <X className="w-4 h-4 text-gray-500" />
+        </button>
+      )}
     </div>
   )
 }

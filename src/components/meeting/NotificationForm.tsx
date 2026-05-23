@@ -10,9 +10,14 @@ import FileUploadArea from '../form/FileUploadArea'
 import FileCard from '../form/FileCard'
 import InfoPopover from '../popover/InfoPopover'
 import AgendaBlockCard from './AgendaBlockCard'
+import ReadOnlyBanner from './ReadOnlyBanner'
 import { useMeetingStore } from '../../store/meetingStore'
 import { showComingSoon } from '../toast/toastHelpers'
 import { formatDate } from '../../lib/format'
+
+interface NotificationFormProps {
+  readOnly?: boolean
+}
 
 const DURATION_OPTIONS = [
   { value: '7', label: '7 дней' },
@@ -41,7 +46,7 @@ interface FormState {
   introError: string | null
 }
 
-export default function NotificationForm() {
+export default function NotificationForm({ readOnly = false }: NotificationFormProps = {}) {
   const meeting = useMeetingStore((s) => s.meeting)
   const setState = useMeetingStore((s) => s.setState)
   const setSubState = useMeetingStore((s) => s.setSubState)
@@ -133,6 +138,7 @@ export default function NotificationForm() {
 
   return (
     <div className="space-y-6">
+      {readOnly && <ReadOnlyBanner />}
       <BackLink />
 
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -180,6 +186,7 @@ export default function NotificationForm() {
           <Select
             value={String(form.durationDays)}
             options={DURATION_OPTIONS}
+            disabled={readOnly}
             onChange={(e) =>
               setForm((s) => ({ ...s, durationDays: Number(e.target.value) }))
             }
@@ -250,6 +257,7 @@ export default function NotificationForm() {
             ref={placeRef}
             aria-label="Место и срок приёма письменных решений собственников по вопросам, поставленным на голосование"
             value={form.paperReceiptPlace}
+            disabled={readOnly}
             error={!!form.placeError}
             onChange={(e) =>
               setForm((s) => ({
@@ -303,6 +311,7 @@ export default function NotificationForm() {
             placeholder={INTRO_PLACEHOLDER}
             maxLength={4000}
             showCounter
+            disabled={readOnly}
             error={!!form.introError}
             onChange={(e) =>
               setForm((s) => ({
@@ -344,10 +353,16 @@ export default function NotificationForm() {
             <FileCard
               name={form.introductionVideo.name}
               sizeBytes={form.introductionVideo.size}
-              onRemove={() =>
-                setForm((s) => ({ ...s, introductionVideo: null, videoError: null }))
+              onRemove={
+                readOnly
+                  ? undefined
+                  : () => setForm((s) => ({ ...s, introductionVideo: null, videoError: null }))
               }
             />
+          ) : readOnly ? (
+            <div className="text-xs text-gray-500 italic px-3 py-2 rounded-lg bg-gray-50 border border-gray-100">
+              Видео не загружалось.
+            </div>
           ) : (
             <FileUploadArea
               accept="video/mp4"
@@ -371,14 +386,16 @@ export default function NotificationForm() {
             <div>email: {meeting.administrator.email}</div>
             <div>телефон: {meeting.administrator.phone}</div>
           </div>
-          <button
-            type="button"
-            onClick={() => showComingSoon()}
-            className="text-sm font-medium hover:underline whitespace-nowrap"
-            style={{ color: 'var(--color-accent-600)' }}
-          >
-            Изменить в профиле →
-          </button>
+          {!readOnly && (
+            <button
+              type="button"
+              onClick={() => showComingSoon()}
+              className="text-sm font-medium hover:underline whitespace-nowrap"
+              style={{ color: 'var(--color-accent-600)' }}
+            >
+              Изменить в профиле →
+            </button>
+          )}
         </div>
       </Card>
 
@@ -386,14 +403,16 @@ export default function NotificationForm() {
       <Card className="p-6 space-y-4">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-base font-semibold text-gray-900">Повестка собрания</h2>
-          <button
-            type="button"
-            onClick={() => setSubState('agenda_main')}
-            className="text-sm font-medium hover:underline"
-            style={{ color: 'var(--color-accent-600)' }}
-          >
-            Редактировать повестку →
-          </button>
+          {!readOnly && (
+            <button
+              type="button"
+              onClick={() => setSubState('agenda_main')}
+              className="text-sm font-medium hover:underline"
+              style={{ color: 'var(--color-accent-600)' }}
+            >
+              Редактировать повестку →
+            </button>
+          )}
         </div>
         <div className="space-y-3">
           {meeting.agenda.map((block, idx) => (
@@ -408,12 +427,14 @@ export default function NotificationForm() {
       </Card>
 
       {/* CTA */}
-      <div className="flex flex-col items-center pt-2 gap-2">
-        <Button onClick={handleContinue}>Продолжить</Button>
-        <div className="text-xs text-gray-500 text-center max-w-md">
-          На следующем экране вы увидите проект уведомления, который будет отправлен собственникам.
+      {!readOnly && (
+        <div className="flex flex-col items-center pt-2 gap-2">
+          <Button onClick={handleContinue}>Продолжить</Button>
+          <div className="text-xs text-gray-500 text-center max-w-md">
+            На следующем экране вы увидите проект уведомления, который будет отправлен собственникам.
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
