@@ -52,6 +52,22 @@
 
 ---
 
+## Сводка по Phase 2
+
+Объём сгенерированного и применённого контента по итогам всех пяти модулей:
+
+- **16 строк замен** из `_temporary/text-diff.md` применены verbatim на экранах 01–04 (Module 1).
+- **~80 новых продуктовых текстов** — H1/H2/leads/helper'ы/labels/banners/popovers/toasts — все по принципам редполитики Госуслуг и Ильяхов. По модулям: M1 ≈ 12, M2 ≈ 18 (включая 8 verbatim из спеки § Контент), M3 ≈ 15 (3 verbatim popover + 5 verbatim helper), M4 ≈ 20 (большая часть verbatim из спеки), M5 ≈ 15 (большая часть verbatim из спеки).
+- **35 квартир + 5 нежилых** в шахматке (`src/lib/demoData.ts → generatePremises()`) — ФИО, КН, площади, доли, проблемы (4 квартиры с issues для демо edge-cases).
+- **8 уникальных собственников** + 1 ТСЖ — реквизиты, СНИЛС, паспорт-данные (только UI-fake, не сохраняются в store).
+- **2 предзаполненных AgendaBlock** (Организационный + Капитальный ремонт кровли) + полный справочник тем + список вопросов 2.1–2.5.
+- **Шахматная ведомость голосования** на 33 квартиры с детерминированным распределением статусов (онлайн / бумажный / отказ / не определился).
+- **Демо-документы** — список преднабранных FileCard'ов: техпаспорт МКД, постановление, смета, договор подряда, акт — все статические fake-File-объекты для UI.
+- **2 демо-варианта** voting (`voting_active` / `voting_active_low_quorum`) + 2 завершённых (`voting_completed` / `voting_completed_no_quorum`) — через query-параметр `?demo-state=`.
+- **6 модалок** (Apartment, CustomQuestion, IncompleteAgenda, PublishConfirm, ConfirmModal-WorkInfo, плюс agenda-preview из VotingActive).
+- **Stepper-маппинг** для всех 9 MeetingState + специальный case для agenda-фазы внутри draft_preparation.
+- **Read-only mode** (FIN.1) — info-плашка + disabled-inputs + hidden-CTAs для экранов 01-12 после `voting_completed`.
+
 ## Phase 0 — Infrastructure
 
 Phase 0 — это технический мостик до production-deploy. Реального продуктового контента не генерится. Placeholder-страница «ОСС — прототип администратора / Phase 0 deploy verified» будет заменена в Phase 1.
@@ -382,3 +398,29 @@ Foundation primitives — visual компоненты + типы + state. Реа
 - **Тип:** правка
 - **Содержимое:** оставлен существующий маппинг (`voting_completed: 4`, `work_info_required: 5`, `archived: 5`) — даёт active на шаге 5 («Завершение голосования») для voting_completed и active на шаге 6 («Размещение информации») для work_info_required. После archive — возвращаемся на дашборд, степпер не виден.
 - **Статус:** verbatim из существующего кода
+
+## Phase 2 — FIN (Read-only после завершения)
+
+### ReadOnlyBanner — info-плашка над экранами 1–4
+- **Локация:** `src/components/meeting/ReadOnlyBanner.tsx`
+- **Тип:** новый UI + verbatim текст из спеки
+- **Источник:** спека `05-completion.md` § Read-only режим шагов 1–4 после завершения
+- **Содержимое:** «Собрание завершено DD.MM.YYYY. Данные доступны только для просмотра.» (DD.MM.YYYY = `meeting.voting.endsAt`). Стиль — accent-50 фон, eye-иконка, border accent-200.
+- **Статус:** новое (verbatim из спеки)
+
+### readOnly prop в PreparationOverview / PreparationPremises / AgendaMain / NotificationForm
+- **Локация:** 4 файла + `src/pages/MeetingFlow.tsx`
+- **Тип:** правка
+- **Содержимое:** добавлен optional `readOnly?: boolean`. Когда `true`:
+  - render `<ReadOnlyBanner />` сверху;
+  - все form-инпуты с `disabled`;
+  - primary CTA (Верно далее / Продолжить / Сохранить / Добавить блок вопрос) — скрыты;
+  - secondary buttons (Изменить в профиле, Редактировать повестку, Edit-block) — скрыты;
+  - useEffect авто-добавления block-1 (AgendaMain) — пропускается, чтобы не мутировать архивный state.
+- **Статус:** новое
+
+### Stepper — кликабельные completed-шаги для перехода в read-only
+- **Локация:** `src/pages/MeetingFlow.tsx`
+- **Тип:** правка
+- **Содержимое:** `stepperSteps()` возвращает `onClick` только для completed-шагов 1/2/3 (preparation_house_overview / agenda_main / notification_form). Step 4 (Сбор голосов) и 5 (Завершение) не имеют read-only-экранов модулей 1–4 — у них собственные экраны (VotingActive / VotingCompleted). Step 6 — work_info_required, тоже свой экран.
+- **Статус:** новое

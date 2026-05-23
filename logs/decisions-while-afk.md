@@ -189,3 +189,40 @@
 **Принятое решение:** прокидываем `confirmLabel="Разместить"` явно в `<ConfirmModal>` в WorkInfoForm. Это уже поддерживалось примитивом.
 
 **Статус ревью:** awaiting.
+
+## [2026-05-23 — FIN.1] Read-only мод — info-плашка + disable-inputs + hide-CTAs
+
+**Вопрос:** Как реализовать read-only режим для экранов 01-12 после `voting_completed`? Варианты — отдельная страница / wrapper-компонент / readOnly-prop в каждом экране.
+
+**Принятое решение:** добавлен optional `readOnly?: boolean` prop в 4 компонента (PreparationOverview, PreparationPremises, AgendaMain, NotificationForm). Каждый отвечает за свой UX:
+- info-плашка `<ReadOnlyBanner />` (новый компонент) сверху по спеке `05-completion.md`;
+- все form-инпуты получают `disabled={readOnly}`;
+- primary CTA (Верно далее / Продолжить / Сохранить / Добавить блок вопрос) и secondary buttons (Изменить в профиле, Редактировать повестку) — скрыты через `{!readOnly && (...)}`;
+- AgendaMain useEffect auto-add block-1 — пропускается в readOnly, чтобы не мутировать архивный state.
+
+`MeetingFlow.tsx` решает, нужен ли readOnly: helper `isReadOnlyForStage(stage, meeting)` сравнивает stage с `stateStageIndex(meeting.state)`. Stepper-step с `status='completed'` и существующим маппингом получает onClick, переключающий subState — это даёт URL-агностичный путь в read-only.
+
+**Альтернативы:**
+- Отдельная страница `<ArchivedMeetingView />` — больше дублирования.
+- Глобальный `<fieldset disabled>` wrapper — не покрывает custom-CTAs.
+- Отдельный wrapper `<ReadOnlyWrapper>` вокруг существующих компонентов — ломает scrollIntoView / refs / inline state.
+
+**Файлы изменены (7):** ReadOnlyBanner.tsx (new), MeetingFlow.tsx, PreparationOverview.tsx, PreparationPremises.tsx, AgendaMain.tsx, NotificationForm.tsx, FileCard.tsx (onRemove → optional).
+
+**Статус ревью:** awaiting.
+
+## [2026-05-23 — FIN.1] FileCard.onRemove → optional
+
+**Вопрос:** В read-only NotificationForm видео-FileCard не должен показывать X-кнопку удаления.
+
+**Принятое решение:** `onRemove` в `FileCardProps` сделано optional. При `undefined` X-кнопка не рендерится. Все существующие вызовы (WorkInfoForm preloaded contract/act, NotificationForm video) продолжают работать.
+
+**Статус ревью:** awaiting.
+
+## [2026-05-23 — FIN.1] Stepper-clicks только на shapes 1/2/3
+
+**Вопрос:** Какие шаги степпера кликабельны в read-only? Все completed?
+
+**Принятое решение:** только step 1 (preparation), step 2 (agenda_main), step 3 (notification_form). Steps 4–6 не имеют отдельных «прошлых» экранов для модулей 1–4 — voting/completion имеют свои экраны (VotingActive/VotingCompleted/WorkInfoForm). Степпер показывает их как `completed` (если архив), но без onClick — клик не делает ничего.
+
+**Статус ревью:** awaiting. Альтернатива — сделать step 4 (Сбор голосов) кликабельным и показывать VotingCompleted; но это переиспользует экран модуля 5 для шага 4 степпера, что путает.
