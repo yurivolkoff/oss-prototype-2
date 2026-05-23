@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
 import AgendaBlockCard from './AgendaBlockCard'
@@ -13,12 +13,16 @@ export default function AgendaMain() {
   const setSubState = useMeetingStore((s) => s.setSubState)
   const setState = useMeetingStore((s) => s.setState)
   const [showIncompleteModal, setShowIncompleteModal] = useState(false)
+  const block1AddedRef = useRef(false)
 
-  // Auto-create block 1 on first enter
+  // Auto-create block 1 on first enter (guarded against StrictMode double-invoke)
   useEffect(() => {
-    if (meeting.agenda.length === 0) {
+    if (block1AddedRef.current) return
+    const exists = useMeetingStore.getState().meeting.agenda.some((b) => b.id === 'block-1')
+    if (!exists) {
       addAgendaBlock(createBlock1())
     }
+    block1AddedRef.current = true
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

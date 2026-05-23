@@ -89,12 +89,7 @@ export default function AgendaBlockCard({
   return (
     <div className="space-y-3">
       <div className="border border-gray-200 rounded-2xl bg-white overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          className="w-full flex items-start gap-3 p-5 text-left hover:bg-gray-50"
-        >
+        <div className="flex items-start gap-3 p-5 hover:bg-gray-50">
           <span
             className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0"
             style={{ background: 'var(--color-accent-600)' }}
@@ -114,8 +109,16 @@ export default function AgendaBlockCard({
               <ThresholdPopover block={block} />
             </div>
           </div>
-          <Chevron className="w-5 h-5 text-gray-400 flex-shrink-0 mt-1" />
-        </button>
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-label={open ? 'Свернуть блок' : 'Развернуть блок'}
+            className="p-1 rounded hover:bg-gray-100 flex-shrink-0 mt-1"
+          >
+            <Chevron className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
 
         {open && (
           <div className="px-5 pb-5 pt-1 border-t border-gray-100">

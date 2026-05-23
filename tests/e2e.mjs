@@ -98,10 +98,61 @@ async function main() {
     '1.5 — Esc закрывает модалку'
   )
 
-  // Continue from screen 03 — should advance to module 2 placeholder
+  // Continue from screen 03 — should advance to module 2 (agenda main, screen 05)
   await page.getByRole('button', { name: 'Продолжить' }).click()
-  await page.waitForTimeout(200)
-  await shot(page, '05-after-continue')
+  await page.waitForTimeout(300)
+  await shot(page, '05-agenda-main-block1')
+
+  // ─── Module 2 — agenda construction ─────────────────────────────
+  await expect(
+    await page.getByRole('heading', { name: 'Повестка собрания' }).isVisible(),
+    '2.1 — screen 05 рендерится (Повестка собрания)'
+  )
+  await expect(
+    (await page.getByText('Организация общего собрания').count()) >= 1,
+    '2.2 — блок 1 «Организация общего собрания» предзаполнен'
+  )
+
+  // Click "Добавить блок вопрос"
+  await page.getByRole('button', { name: 'Добавить блок вопрос' }).click()
+  await page.waitForTimeout(300)
+  await shot(page, '06-wizard-type')
+  await expect(
+    await page.getByRole('heading', { name: 'Новый блок вопросов' }).isVisible(),
+    '2.3 — screen 06 wizard type рендерится'
+  )
+
+  // Click "Капитальный ремонт" category row
+  await page.getByText('Капитальный ремонт', { exact: true }).first().click()
+  await page.waitForTimeout(300)
+  await shot(page, '07-wizard-theme')
+  await expect(
+    (await page.getByText('Справочник вопросов').count()) >= 1,
+    '2.4 — screen 07 wizard theme рендерится'
+  )
+
+  // Click "Ремонт крыши" (interactive theme — the "works" section is open by default)
+  await page.getByText('Ремонт крыши', { exact: true }).click()
+  await page.waitForTimeout(300)
+  await shot(page, '08-wizard-questions')
+  await expect(
+    (await page.getByText('Выберите вопросы и заполните параметры').count()) >= 1,
+    '2.5 — screen 08 wizard questions рендерится'
+  )
+
+  // Save block
+  await page.getByRole('button', { name: 'Сохранить' }).click()
+  await page.waitForTimeout(400)
+  await shot(page, '09-agenda-final')
+  await expect(
+    (await page.getByText('Капитальный ремонт кровли').count()) >= 1,
+    '2.6 — блок 2 «Капитальный ремонт кровли» добавлен в повестку'
+  )
+
+  // Click "Продолжить" — should navigate to module 3 (placeholder)
+  await page.getByRole('button', { name: 'Продолжить' }).click()
+  await page.waitForTimeout(300)
+  await shot(page, '10-after-agenda-continue')
 
   // ─── FINAL ─────────────────────────────────────────────────────────
   console.log('\n──────────────────────────')
