@@ -3,6 +3,10 @@ import AppLayout from '../components/layout/AppLayout'
 import Stepper, { STEPPER_LABELS, type StepStatus } from '../components/stepper/Stepper'
 import PreparationOverview from '../components/meeting/PreparationOverview'
 import PreparationPremises from '../components/meeting/PreparationPremises'
+import AgendaMain from '../components/meeting/AgendaMain'
+import AgendaWizardType from '../components/meeting/AgendaWizardType'
+import AgendaWizardTheme from '../components/meeting/AgendaWizardTheme'
+import AgendaWizardQuestions from '../components/meeting/AgendaWizardQuestions'
 
 export default function MeetingFlow() {
   const meeting = useMeetingStore((s) => s.meeting)
@@ -47,7 +51,16 @@ export default function MeetingFlow() {
       return <PreparationPremises />
     }
     if (meeting.state === 'draft_preparation' && meeting.subState === 'agenda_main') {
-      return <PlaceholderForFutureTask name="05 — Повестка (Module 2)" />
+      return <AgendaMain />
+    }
+    if (meeting.state === 'draft_preparation' && meeting.subState === 'agenda_wizard_type') {
+      return <AgendaWizardType />
+    }
+    if (meeting.state === 'draft_preparation' && meeting.subState === 'agenda_wizard_theme') {
+      return <AgendaWizardTheme />
+    }
+    if (meeting.state === 'draft_preparation' && meeting.subState === 'agenda_wizard_questions') {
+      return <AgendaWizardQuestions />
     }
     return (
       <PlaceholderForFutureTask
