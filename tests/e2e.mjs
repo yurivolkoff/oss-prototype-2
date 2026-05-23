@@ -149,10 +149,57 @@ async function main() {
     '2.6 — блок 2 «Капитальный ремонт кровли» добавлен в повестку'
   )
 
-  // Click "Продолжить" — should navigate to module 3 (placeholder)
+  // Click "Продолжить" — should navigate to module 3 (notification form)
   await page.getByRole('button', { name: 'Продолжить' }).click()
   await page.waitForTimeout(300)
   await shot(page, '10-after-agenda-continue')
+
+  // ─── Module 3 — notification ────────────────────────────────────
+  // continuation from module 2 «Продолжить» click; subState now 'notification_form'
+  await page.waitForTimeout(300)
+  await shot(page, '10-notification-form')
+  await expect(
+    await page.getByLabel(/Место и срок приёма письменных решений/).isVisible(),
+    '3.1 — поле «место приёма» переименовано'
+  )
+
+  // Fill required: вступительное слово (≥100 chars)
+  const intro = 'Уважаемые соседи! В нашем доме нужно решить вопрос о капитальном ремонте кровли. Голосование займёт 60 дней, пожалуйста, не пропустите его.'
+  await page.getByLabel(/Вступительное слово/).fill(intro)
+
+  await page.getByRole('button', { name: 'Продолжить' }).click()
+  await page.waitForTimeout(300)
+  await shot(page, '12-notification-preview')
+  await expect(
+    await page.getByRole('heading', { name: 'Подтверждение голосования' }).isVisible(),
+    '3.2 — screen 12 рендерится'
+  )
+
+  await page.getByRole('button', { name: 'Отправить' }).click()
+  await page.waitForTimeout(300)
+  await shot(page, '12-publish-confirm')
+  await expect(
+    await page.getByText('Опубликовать уведомление?').isVisible(),
+    '3.3 — финальная модалка confirm открывается'
+  )
+
+  // Cancel + reopen + confirm
+  await page.getByRole('button', { name: 'Отмена' }).click()
+  await page.waitForTimeout(200)
+  await page.getByRole('button', { name: 'Отправить' }).click()
+  await page.waitForTimeout(200)
+  await page.getByRole('button', { name: 'Опубликовать' }).click()
+  await page.waitForTimeout(500)
+  await page.waitForLoadState('networkidle')
+  await shot(page, '01-dashboard-after-publish')
+  const finalUrl = await page.url()
+  await expect(
+    finalUrl.endsWith('/oss-prototype-2/') ||
+      finalUrl.endsWith('/oss-prototype-2') ||
+      /\/oss-prototype-2\/?(\?|$)/.test(finalUrl),
+    '3.4 — возврат на дашборд после публикации',
+    finalUrl,
+  )
 
   // ─── FINAL ─────────────────────────────────────────────────────────
   console.log('\n──────────────────────────')
